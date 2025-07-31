@@ -7,6 +7,8 @@ const upgradeBtn = document.getElementById('upgrade');
 const prestigeBtn = document.getElementById('prestige');
 const normalShop = document.getElementById('normalShop');
 const prestigeShop = document.getElementById('prestigeShop');
+const normalTabBtn = document.getElementById('normalTab');
+const prestigeTabBtn = document.getElementById('prestigeTab');
 
 let score = 0;
 let progress = 0;
@@ -48,12 +50,16 @@ function updateCarImage() {
 }
 
 function clickCar() {
+  // Add progress by clickPower, capped at 100
   progress += clickPower;
+  if (progress > 100) progress = 100;
+  progressBar.style.width = `${progress}%`;
+  // Score only increases when bar fills completely and resets progress
   if (progress >= 100) {
     progress = 0;
     score += Math.floor(upgradeLevel * 15 * barSpeed);
+    progressBar.style.width = '0%';
   }
-  progressBar.style.width = `${progress}%`;
   updateDisplays();
 }
 
@@ -73,11 +79,13 @@ function upgradeCar() {
 
 function autoProgress() {
   progress += 0.1 * barSpeed + autoPower;
+  if (progress > 100) progress = 100;
+  progressBar.style.width = `${progress}%`;
   if (progress >= 100) {
     progress = 0;
     score += Math.floor(upgradeLevel * 15 * barSpeed);
+    progressBar.style.width = '0%';
   }
-  progressBar.style.width = `${progress}%`;
   updateDisplays();
 }
 
@@ -98,10 +106,17 @@ function prestige() {
 }
 
 function switchShop(tab) {
-  normalShop.classList.remove('activeTab');
-  prestigeShop.classList.remove('activeTab');
-  if (tab === 'normal') normalShop.classList.add('activeTab');
-  else if (tab === 'prestige') prestigeShop.classList.add('activeTab');
+  if (tab === 'normal') {
+    normalShop.classList.add('activeTab');
+    prestigeShop.classList.remove('activeTab');
+    normalTabBtn.disabled = true;
+    prestigeTabBtn.disabled = false;
+  } else if (tab === 'prestige') {
+    prestigeShop.classList.add('activeTab');
+    normalShop.classList.remove('activeTab');
+    prestigeTabBtn.disabled = true;
+    normalTabBtn.disabled = false;
+  }
 }
 
 function renderShops() {
@@ -147,10 +162,14 @@ function renderShops() {
   });
 }
 
-// Initial setup
+// Setup event listeners
 carImage.addEventListener('click', clickCar);
 upgradeBtn.addEventListener('click', upgradeCar);
 prestigeBtn.addEventListener('click', prestige);
+normalTabBtn.addEventListener('click', () => switchShop('normal'));
+prestigeTabBtn.addEventListener('click', () => switchShop('prestige'));
+
+// Initialize game UI
 switchShop('normal');
 updateCarImage();
 
