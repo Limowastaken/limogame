@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Limo</title>
+  <title>Limo Clicker Mini App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="style.css" />
@@ -10,14 +10,22 @@
 <body>
   <div class="game-container">
     <h1>Limo Clicker</h1>
+    
+    <div id="xp-bar-container">
+      <div id="xp-bar"></div>
+    </div>
+    
     <div id="car-container">
       <img id="car-image" src="cars/car1.png" alt="Car" />
+      <div id="click-float">+1</div>
     </div>
+
     <div class="click-info">
       <p>Clicks: <span id="click-count">0</span></p>
-      <button id="upgrade-btn">Upgrade (Cost: <span id="upgrade-cost">10</span>)</button>
+      <button id="upgrade-btn">🔼 Upgrade (Cost: <span id="upgrade-cost">10</span>)</button>
     </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
