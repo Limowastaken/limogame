@@ -7,8 +7,10 @@ const upgradeBtn = document.getElementById('upgrade');
 const prestigeBtn = document.getElementById('prestige');
 const normalShop = document.getElementById('normalShop');
 const prestigeShop = document.getElementById('prestigeShop');
-const normalTabBtn = document.getElementById('normalTab');
-const prestigeTabBtn = document.getElementById('prestigeTab');
+const normalTabBtn = document.getElementById('gameTabBtn');
+const prestigeTabBtn = document.getElementById('shopTabBtn');
+const gameDiv = document.getElementById('gameDiv');
+const shopDiv = document.getElementById('shopDiv');
 
 let score = 0;
 let progress = 0;
@@ -38,7 +40,6 @@ const prestigeUpgrades = [
   { name: "Click Multiplier x2", baseCost: 20, cost: 20, action: () => clickPower *= 2 }
 ];
 
-// Update all displays
 function updateDisplays() {
   scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
   levelDisplay.textContent = `Car Level: ${upgradeLevel}`;
@@ -50,11 +51,10 @@ function updateCarImage() {
 }
 
 function clickCar() {
-  // Add progress by clickPower, capped at 100
   progress += clickPower;
   if (progress > 100) progress = 100;
   progressBar.style.width = `${progress}%`;
-  // Score only increases when bar fills completely and resets progress
+
   if (progress >= 100) {
     progress = 0;
     score += Math.floor(upgradeLevel * 15 * barSpeed);
@@ -64,7 +64,7 @@ function clickCar() {
 }
 
 function upgradeCar() {
-  const cost = Math.floor(100 * Math.pow(1.6, upgradeLevel - 1)); // exponential scaling
+  const cost = Math.floor(100 * Math.pow(1.6, upgradeLevel - 1));
   if (score >= cost && upgradeLevel < maxLevel) {
     score -= cost;
     upgradeLevel++;
@@ -81,6 +81,7 @@ function autoProgress() {
   progress += 0.1 * barSpeed + autoPower;
   if (progress > 100) progress = 100;
   progressBar.style.width = `${progress}%`;
+
   if (progress >= 100) {
     progress = 0;
     score += Math.floor(upgradeLevel * 15 * barSpeed);
@@ -105,17 +106,17 @@ function prestige() {
   }
 }
 
-function switchShop(tab) {
-  if (tab === 'normal') {
-    normalShop.classList.add('activeTab');
-    prestigeShop.classList.remove('activeTab');
-    normalTabBtn.disabled = true;
-    prestigeTabBtn.disabled = false;
-  } else if (tab === 'prestige') {
-    prestigeShop.classList.add('activeTab');
-    normalShop.classList.remove('activeTab');
-    prestigeTabBtn.disabled = true;
-    normalTabBtn.disabled = false;
+function switchTab(tab) {
+  if (tab === 'game') {
+    gameDiv.style.display = 'block';
+    shopDiv.style.display = 'none';
+    normalTabBtn.classList.add('active');
+    prestigeTabBtn.classList.remove('active');
+  } else if (tab === 'shop') {
+    shopDiv.style.display = 'block';
+    gameDiv.style.display = 'none';
+    prestigeTabBtn.classList.add('active');
+    normalTabBtn.classList.remove('active');
   }
 }
 
@@ -126,7 +127,7 @@ function renderShops() {
   upgrades.forEach((upg, i) => {
     const item = document.createElement('div');
     item.className = 'shopItem';
-    const cost = Math.floor(upg.baseCost * Math.pow(1.5, i)); // Scale cost per index
+    const cost = Math.floor(upg.baseCost * Math.pow(1.5, i));
     upg.cost = cost;
     item.textContent = `${upg.name} - ${cost} points`;
     if (score < cost) item.classList.add('disabled');
@@ -145,7 +146,7 @@ function renderShops() {
   prestigeUpgrades.forEach((upg, i) => {
     const item = document.createElement('div');
     item.className = 'shopItem';
-    const cost = Math.floor(upg.baseCost * Math.pow(1.8, i)); // Prestige cost scales a bit faster
+    const cost = Math.floor(upg.baseCost * Math.pow(1.8, i));
     upg.cost = cost;
     item.textContent = `${upg.name} - ${cost} prestige`;
     if (prestigePoints < cost) item.classList.add('disabled');
@@ -162,20 +163,18 @@ function renderShops() {
   });
 }
 
-// Setup event listeners
+// Event listeners
 carImage.addEventListener('click', clickCar);
 upgradeBtn.addEventListener('click', upgradeCar);
 prestigeBtn.addEventListener('click', prestige);
-normalTabBtn.addEventListener('click', () => switchShop('normal'));
-prestigeTabBtn.addEventListener('click', () => switchShop('prestige'));
+normalTabBtn.addEventListener('click', () => switchTab('game'));
+prestigeTabBtn.addEventListener('click', () => switchTab('shop'));
 
-// Initialize game UI
-switchShop('normal');
+// Init
+switchTab('game');
 updateCarImage();
-
 setInterval(() => {
   autoProgress();
   renderShops();
 }, 100);
-
 updateDisplays();
