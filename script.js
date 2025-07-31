@@ -7,8 +7,8 @@ const upgradeBtn = document.getElementById('upgrade');
 const prestigeBtn = document.getElementById('prestige');
 const normalShop = document.getElementById('normalShop');
 const prestigeShop = document.getElementById('prestigeShop');
-const normalTabBtn = document.getElementById('gameTabBtn');
-const prestigeTabBtn = document.getElementById('shopTabBtn');
+const gameTabBtn = document.getElementById('gameTabBtn');
+const shopTabBtn = document.getElementById('shopTabBtn');
 const gameDiv = document.getElementById('gameDiv');
 const shopDiv = document.getElementById('shopDiv');
 
@@ -57,7 +57,12 @@ function clickCar() {
 
   if (progress >= 100) {
     progress = 0;
-    score += Math.floor(upgradeLevel * 15 * barSpeed);
+    // Car 1 gives 4 points fixed, others scale
+    if (upgradeLevel === 1) {
+      score += 4;
+    } else {
+      score += Math.floor(upgradeLevel * 15 * barSpeed);
+    }
     progressBar.style.width = '0%';
   }
   updateDisplays();
@@ -74,6 +79,9 @@ function upgradeCar() {
     progress = 0;
     progressBar.style.width = '0%';
     updateDisplays();
+  } else {
+    const needed = cost - score;
+    alert(`Not enough points to upgrade! Need ${needed} more.`);
   }
 }
 
@@ -84,7 +92,11 @@ function autoProgress() {
 
   if (progress >= 100) {
     progress = 0;
-    score += Math.floor(upgradeLevel * 15 * barSpeed);
+    if (upgradeLevel === 1) {
+      score += 4;
+    } else {
+      score += Math.floor(upgradeLevel * 15 * barSpeed);
+    }
     progressBar.style.width = '0%';
   }
   updateDisplays();
@@ -102,7 +114,8 @@ function prestige() {
     updateDisplays();
     progressBar.style.width = '0%';
   } else {
-    alert('You need to max your car (level 10) to prestige!');
+    const needed = maxLevel - upgradeLevel;
+    alert(`You need to max your car (level ${maxLevel}) to prestige! Level up ${needed} more.`);
   }
 }
 
@@ -110,13 +123,13 @@ function switchTab(tab) {
   if (tab === 'game') {
     gameDiv.style.display = 'block';
     shopDiv.style.display = 'none';
-    normalTabBtn.classList.add('active');
-    prestigeTabBtn.classList.remove('active');
+    gameTabBtn.classList.add('active');
+    shopTabBtn.classList.remove('active');
   } else if (tab === 'shop') {
     shopDiv.style.display = 'block';
     gameDiv.style.display = 'none';
-    prestigeTabBtn.classList.add('active');
-    normalTabBtn.classList.remove('active');
+    shopTabBtn.classList.add('active');
+    gameTabBtn.classList.remove('active');
   }
 }
 
@@ -138,6 +151,8 @@ function renderShops() {
         upg.action();
         updateDisplays();
         renderShops();
+      } else {
+        alert(`You need ${cost - score} more points to buy this upgrade.`);
       }
     };
     normalShop.appendChild(item);
@@ -157,6 +172,8 @@ function renderShops() {
         upg.action();
         updateDisplays();
         renderShops();
+      } else {
+        alert(`You need ${cost - prestigePoints} more prestige points to buy this upgrade.`);
       }
     };
     prestigeShop.appendChild(item);
@@ -167,8 +184,8 @@ function renderShops() {
 carImage.addEventListener('click', clickCar);
 upgradeBtn.addEventListener('click', upgradeCar);
 prestigeBtn.addEventListener('click', prestige);
-normalTabBtn.addEventListener('click', () => switchTab('game'));
-prestigeTabBtn.addEventListener('click', () => switchTab('shop'));
+gameTabBtn.addEventListener('click', () => switchTab('game'));
+shopTabBtn.addEventListener('click', () => switchTab('shop'));
 
 // Init
 switchTab('game');
