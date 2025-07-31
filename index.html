@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Limo Clicker Mini App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Limo Clicker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="game-container">
-    <h1>Limo Clicker</h1>
-    
-    <div id="xp-bar-container">
-      <div id="xp-bar"></div>
+  <h1>🚗 Limo Upgrade Clicker</h1>
+  <div id="gameContainer">
+    <img id="car" src="cars/car1.png" alt="Car" />
+    <div id="progressContainer">
+      <div id="progressBar"></div>
     </div>
-    
-    <div id="car-container">
-      <img id="car-image" src="cars/car1.png" alt="Car" />
-      <div id="click-float">+1</div>
+    <div id="score">Score: 0</div>
+    <div id="level">Car Level: 1</div>
+    <div id="prestigePoints">Prestige Points: 0</div>
+    <button class="btn" id="upgrade">Upgrade Car</button>
+    <button class="btn" id="prestige">Prestige</button>
+    <div id="shopTabs">
+      <button class="btn" onclick="switchShop('normal')">Normal Shop</button>
+      <button class="btn" onclick="switchShop('prestige')">Prestige Shop</button>
     </div>
-
-    <div class="click-info">
-      <p>Clicks: <span id="click-count">0</span></p>
-      <button id="upgrade-btn">🔼 Upgrade (Cost: <span id="upgrade-cost">10</span>)</button>
-    </div>
+    <div id="normalShop" class="shopSection"></div>
+    <div id="prestigeShop" class="shopSection"></div>
   </div>
 
   <script src="script.js"></script>
