@@ -1,54 +1,162 @@
-let clicks = parseInt(localStorage.getItem('clicks')) || 0;
-let upgradeLevel = parseInt(localStorage.getItem('upgradeLevel')) || 1;
-let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 10;
-const maxLevel = 10;
-const xpPerLevel = 10;
+const carImage = document.getElementById('car');
+const progressBar = document.getElementById('progressBar');
+const scoreDisplay = document.getElementById('score');
+const levelDisplay = document.getElementById('level');
+const prestigeDisplay = document.getElementById('prestigePoints');
+const upgradeBtn = document.getElementById('upgrade');
+const prestigeBtn = document.getElementById('prestige');
+const normalShop = document.getElementById('normalShop');
+const prestigeShop = document.getElementById('prestigeShop');
 
-const clickCount = document.getElementById('click-count');
-const upgradeBtn = document.getElementById('upgrade-btn');
-const upgradeCostSpan = document.getElementById('upgrade-cost');
-const carImage = document.getElementById('car-image');
-const clickFloat = document.getElementById('click-float');
-const xpBar = document.getElementById('xp-bar');
+let score = 0;
+let progress = 0;
+let upgradeLevel = 1;
+let clickPower = 1;
+let barSpeed = 0.3;
+let prestigePoints = 0;
+let maxLevel = 10;
+let prestigeBonus = 1;
+let autoPower = 0;
 
-function updateUI() {
-  clickCount.innerText = clicks;
-  upgradeCostSpan.innerText = upgradeCost;
-  carImage.src = `cars/car${upgradeLevel}.png`;
-  xpBar.style.width = `${(clicks % xpPerLevel) / xpPerLevel * 100}%`;
+// Normal shop upgrades (cost balanced)
+const upgrades = [
+  { name: "+1 Click Power", baseCost: 100, cost: 100, action: () => clickPower++ },
+  { name: "+0.2 Bar Speed", baseCost: 150, cost: 150, action: () => barSpeed += 0.2 },
+  { name: "Double Score", baseCost: 300, cost: 300, action: () => clickPower *= 2 },
+  { name: "Faster Fill", baseCost: 500, cost: 500, action: () => barSpeed *= 1.5 },
+  { name: "+3 Click Power", baseCost: 1000, cost: 1000, action: () => clickPower += 3 }
+];
+
+// Prestige shop upgrades (cost balanced)
+const prestigeUpgrades = [
+  { name: "+1 Prestige Point per Prestige", baseCost: 5, cost: 5, action: () => prestigeBonus++ },
+  { name: "+0.5 Bar Speed", baseCost: 8, cost: 8, action: () => barSpeed += 0.5 },
+  { name: "AutoClicker Boost +1", baseCost: 12, cost: 12, action: () => autoPower += 1 },
+  { name: "+5 Click Power", baseCost: 10, cost: 10, action: () => clickPower += 5 },
+  { name: "Click Multiplier x2", baseCost: 20, cost: 20, action: () => clickPower *= 2 }
+];
+
+// Update all displays
+function updateDisplays() {
+  scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
+  levelDisplay.textContent = `Car Level: ${upgradeLevel}`;
+  prestigeDisplay.textContent = `Prestige Points: ${prestigePoints}`;
 }
 
-function animateClick() {
-  clickFloat.style.opacity = 1;
-  clickFloat.style.transform = 'translate(-50%, -80%)';
-  setTimeout(() => {
-    clickFloat.style.opacity = 0;
-    clickFloat.style.transform = 'translate(-50%, -50%)';
-  }, 300);
+function updateCarImage() {
+  carImage.src = `cars/car${Math.min(upgradeLevel, maxLevel)}.png`;
 }
 
-document.getElementById('car-container').addEventListener('click', () => {
-  clicks++;
-  localStorage.setItem('clicks', clicks);
-  animateClick();
-  updateUI();
-});
-
-upgradeBtn.addEventListener('click', () => {
-  if (clicks >= upgradeCost && upgradeLevel < maxLevel) {
-    clicks -= upgradeCost;
-    upgradeLevel++;
-    upgradeCost = Math.floor(upgradeCost * 1.5);
-
-    localStorage.setItem('clicks', clicks);
-    localStorage.setItem('upgradeLevel', upgradeLevel);
-    localStorage.setItem('upgradeCost', upgradeCost);
-
-    carImage.classList.add('upgrade-animation');
-    setTimeout(() => carImage.classList.remove('upgrade-animation'), 400);
-
-    updateUI();
+function clickCar() {
+  progress += clickPower;
+  if (progress >= 100) {
+    progress = 0;
+    score += Math.floor(upgradeLevel * 15 * barSpeed);
   }
-});
+  progressBar.style.width = `${progress}%`;
+  updateDisplays();
+}
 
-updateUI();
+function upgradeCar() {
+  const cost = Math.floor(100 * Math.pow(1.6, upgradeLevel - 1)); // exponential scaling
+  if (score >= cost && upgradeLevel < maxLevel) {
+    score -= cost;
+    upgradeLevel++;
+    clickPower += 0.7;
+    barSpeed += 0.1;
+    updateCarImage();
+    progress = 0;
+    progressBar.style.width = '0%';
+    updateDisplays();
+  }
+}
+
+function autoProgress() {
+  progress += 0.1 * barSpeed + autoPower;
+  if (progress >= 100) {
+    progress = 0;
+    score += Math.floor(upgradeLevel * 15 * barSpeed);
+  }
+  progressBar.style.width = `${progress}%`;
+  updateDisplays();
+}
+
+function prestige() {
+  if (upgradeLevel === maxLevel) {
+    prestigePoints += prestigeBonus;
+    score = 0;
+    progress = 0;
+    upgradeLevel = 1;
+    clickPower = 1;
+    barSpeed = 0.3;
+    updateCarImage();
+    updateDisplays();
+    progressBar.style.width = '0%';
+  } else {
+    alert('You need to max your car (level 10) to prestige!');
+  }
+}
+
+function switchShop(tab) {
+  normalShop.classList.remove('activeTab');
+  prestigeShop.classList.remove('activeTab');
+  if (tab === 'normal') normalShop.classList.add('activeTab');
+  else if (tab === 'prestige') prestigeShop.classList.add('activeTab');
+}
+
+function renderShops() {
+  normalShop.innerHTML = '';
+  prestigeShop.innerHTML = '';
+
+  upgrades.forEach((upg, i) => {
+    const item = document.createElement('div');
+    item.className = 'shopItem';
+    const cost = Math.floor(upg.baseCost * Math.pow(1.5, i)); // Scale cost per index
+    upg.cost = cost;
+    item.textContent = `${upg.name} - ${cost} points`;
+    if (score < cost) item.classList.add('disabled');
+    else item.classList.remove('disabled');
+    item.onclick = () => {
+      if (score >= cost) {
+        score -= cost;
+        upg.action();
+        updateDisplays();
+        renderShops();
+      }
+    };
+    normalShop.appendChild(item);
+  });
+
+  prestigeUpgrades.forEach((upg, i) => {
+    const item = document.createElement('div');
+    item.className = 'shopItem';
+    const cost = Math.floor(upg.baseCost * Math.pow(1.8, i)); // Prestige cost scales a bit faster
+    upg.cost = cost;
+    item.textContent = `${upg.name} - ${cost} prestige`;
+    if (prestigePoints < cost) item.classList.add('disabled');
+    else item.classList.remove('disabled');
+    item.onclick = () => {
+      if (prestigePoints >= cost) {
+        prestigePoints -= cost;
+        upg.action();
+        updateDisplays();
+        renderShops();
+      }
+    };
+    prestigeShop.appendChild(item);
+  });
+}
+
+// Initial setup
+carImage.addEventListener('click', clickCar);
+upgradeBtn.addEventListener('click', upgradeCar);
+prestigeBtn.addEventListener('click', prestige);
+switchShop('normal');
+updateCarImage();
+
+setInterval(() => {
+  autoProgress();
+  renderShops();
+}, 100);
+
+updateDisplays();
