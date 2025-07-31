@@ -40,6 +40,9 @@ const prestigeUpgrades = [
   { name: "Click Multiplier x2", baseCost: 20, cost: 20, action: () => clickPower *= 2 }
 ];
 
+let lastScore = -1;
+let lastPrestige = -1;
+
 function updateDisplays() {
   scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
   levelDisplay.textContent = `Car Level: ${upgradeLevel}`;
@@ -51,26 +54,33 @@ function updateCarImage() {
 }
 
 function clickCar() {
+  // Animate tap
+  carImage.classList.add('tap');
+  setTimeout(() => carImage.classList.remove('tap'), 200);
+
   progress += clickPower;
   if (progress > 100) progress = 100;
   progressBar.style.width = `${progress}%`;
 
   if (progress >= 100) {
     progress = 0;
-    // Car 1 gives 4 points fixed, others scale
     if (upgradeLevel === 1) {
       score += 4;
     } else {
       score += Math.floor(upgradeLevel * 15 * barSpeed);
     }
     progressBar.style.width = '0%';
+    updateDisplays();
   }
-  updateDisplays();
 }
 
 function upgradeCar() {
+  if (upgradeLevel >= maxLevel) {
+    alert('You already maxed out your car!');
+    return;
+  }
   const cost = Math.floor(100 * Math.pow(1.6, upgradeLevel - 1));
-  if (score >= cost && upgradeLevel < maxLevel) {
+  if (score >= cost) {
     score -= cost;
     upgradeLevel++;
     clickPower += 0.7;
@@ -133,65 +143,13 @@ function switchTab(tab) {
   }
 }
 
+// Optimized shop render only if points changed
 function renderShops() {
+  if (lastScore === score && lastPrestige === prestigePoints) return;
+  lastScore = score;
+  lastPrestige = prestigePoints;
+
   normalShop.innerHTML = '';
   prestigeShop.innerHTML = '';
 
-  upgrades.forEach((upg, i) => {
-    const item = document.createElement('div');
-    item.className = 'shopItem';
-    const cost = Math.floor(upg.baseCost * Math.pow(1.5, i));
-    upg.cost = cost;
-    item.textContent = `${upg.name} - ${cost} points`;
-    if (score < cost) item.classList.add('disabled');
-    else item.classList.remove('disabled');
-    item.onclick = () => {
-      if (score >= cost) {
-        score -= cost;
-        upg.action();
-        updateDisplays();
-        renderShops();
-      } else {
-        alert(`You need ${cost - score} more points to buy this upgrade.`);
-      }
-    };
-    normalShop.appendChild(item);
-  });
-
-  prestigeUpgrades.forEach((upg, i) => {
-    const item = document.createElement('div');
-    item.className = 'shopItem';
-    const cost = Math.floor(upg.baseCost * Math.pow(1.8, i));
-    upg.cost = cost;
-    item.textContent = `${upg.name} - ${cost} prestige`;
-    if (prestigePoints < cost) item.classList.add('disabled');
-    else item.classList.remove('disabled');
-    item.onclick = () => {
-      if (prestigePoints >= cost) {
-        prestigePoints -= cost;
-        upg.action();
-        updateDisplays();
-        renderShops();
-      } else {
-        alert(`You need ${cost - prestigePoints} more prestige points to buy this upgrade.`);
-      }
-    };
-    prestigeShop.appendChild(item);
-  });
-}
-
-// Event listeners
-carImage.addEventListener('click', clickCar);
-upgradeBtn.addEventListener('click', upgradeCar);
-prestigeBtn.addEventListener('click', prestige);
-gameTabBtn.addEventListener('click', () => switchTab('game'));
-shopTabBtn.addEventListener('click', () => switchTab('shop'));
-
-// Init
-switchTab('game');
-updateCarImage();
-setInterval(() => {
-  autoProgress();
-  renderShops();
-}, 100);
-updateDisplays();
+  upgrades.forEach((up
