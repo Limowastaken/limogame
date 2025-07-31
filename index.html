@@ -1,36 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Limo Clicker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Limo Clicker</h1>
+  <div class="container">
+    <h1 class="title">Limo Clicker</h1>
 
-  <div id="gameDiv" class="tabContent">
-    <img id="car" src="cars/car1.png" alt="Car" />
-    <div id="progressContainer">
-      <div id="progressBar"></div>
+    <div id="gameDiv" class="tab">
+      <img id="carImage" src="cars/car1.png" alt="Car" />
+      <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div class="score-display">
+        <p>Score: <span id="score">0</span></p>
+        <p>Prestige Points: <span id="prestige">0</span></p>
+      </div>
+      <button id="upgradeBtn">Upgrade</button>
+      <button id="prestigeBtn">Prestige</button>
     </div>
-    <div id="score">Score: 0</div>
-    <div id="level">Car Level: 1</div>
-    <div id="prestigePoints">Prestige Points: 0</div>
-    <button class="btn" id="upgrade">Upgrade Car</button>
-    <button class="btn" id="prestige">Prestige</button>
-  </div>
 
-  <div id="shopDiv" class="tabContent" style="display:none;">
-    <h2>Normal Shop</h2>
-    <div id="normalShop" class="shopSection"></div>
-    <h2>Prestige Shop</h2>
-    <div id="prestigeShop" class="shopSection"></div>
-  </div>
+    <div id="shopDiv" class="tab hidden">
+      <div class="shopSection">
+        <h2>Normal Upgrades</h2>
+        <div id="normalShop"></div>
+      </div>
+      <div class="shopSection">
+        <h2>Prestige Upgrades</h2>
+        <div id="prestigeShop"></div>
+      </div>
+    </div>
 
-  <div id="dock">
-    <button class="dockBtn active" id="gameTabBtn" title="Game">🎮</button>
-    <button class="dockBtn" id="shopTabBtn" title="Shop">🛒</button>
+    <!-- Mac-style bottom deck -->
+    <div id="tabButtonsBottom">
+      <button onclick="switchTab('game')">🏎 Game</button>
+      <button onclick="switchTab('shop')">🛒 Shop</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
