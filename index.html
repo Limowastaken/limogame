@@ -8,7 +8,13 @@
 </head>
 <body>
   <h1>🚗 Limo Upgrade Clicker</h1>
-  <div id="gameContainer">
+
+  <div id="tabButtons">
+    <button class="tabBtn active" id="gameTabBtn">Game</button>
+    <button class="tabBtn" id="shopTabBtn">Shop</button>
+  </div>
+
+  <div id="gameDiv" class="tabContent">
     <img id="car" src="cars/car1.png" alt="Car" />
     <div id="progressContainer">
       <div id="progressBar"></div>
@@ -18,11 +24,12 @@
     <div id="prestigePoints">Prestige Points: 0</div>
     <button class="btn" id="upgrade">Upgrade Car</button>
     <button class="btn" id="prestige">Prestige</button>
-    <div id="shopTabs">
-      <button class="btn" id="normalTab">Normal Shop</button>
-      <button class="btn" id="prestigeTab">Prestige Shop</button>
-    </div>
-    <div id="normalShop" class="shopSection activeTab"></div>
+  </div>
+
+  <div id="shopDiv" class="tabContent" style="display:none;">
+    <h2>Normal Shop</h2>
+    <div id="normalShop" class="shopSection"></div>
+    <h2>Prestige Shop</h2>
     <div id="prestigeShop" class="shopSection"></div>
   </div>
 
